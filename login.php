@@ -1,9 +1,12 @@
 <?php
+header('Content-Type: application/json');
 session_start();
 include_once('config.php');
 
+$rawData = file_get_contents('php://input');
+$dt = json_decode($rawData, true);
+
 function sendJsonResponse($status, $message,$data = []){
-    Header('Content-Type: application/json');
     echo json_encode([
         'status' => $status,
         'message' => $message,
@@ -13,10 +16,6 @@ function sendJsonResponse($status, $message,$data = []){
 }
 
 function loginUser($conn,$email,$password){
-    if(empty($email) || empty($password)){
-        sendJsonResponse("Error","Email atau password tidak boleh kosong");
-    }
-
     $query = "SELECT id, password from user where email = ?";
     if($statement = $conn->prepare($query)){
         $statement->bind_param("s", $email);
@@ -60,10 +59,10 @@ function checkLoggedIn(){
 }
 
 if($_SERVER['REQUEST_METHOD'] === 'POST'){
-    if(isset($_POST['email']) && isset($_POST['password'])){
-        loginUser($connection,$_POST['email'],$_POST['password']);
+    if(!isset($dt['email'], $dt['password']) || $dt['email'] === "" || $dt['password'] === ""){
+        sendJsonResponse("Error","Email atau password tidak boleh kosong");
     }
-    sendJsonResponse("Error","Missing post value");
+    loginUser($connection,$dt['email'],$dt['password']);
 }else if($_SERVER['REQUEST_METHOD'] === 'GET'){
     checkLoggedIn();
 }else{
