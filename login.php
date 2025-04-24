@@ -46,7 +46,7 @@ function loginUser($conn,$email,$password){
 
 function checkLoggedIn(){
     if(isset($_SESSION['account_logged_in']) && $_SESSION['account_logged_in'] === true){
-        sendJsonResponse("Succes","Anda sudah login",[
+        sendJsonResponse("Success","Anda sudah login",[
             'status' => true,
             'id' => $_SESSION['account_id'],
             'email' => $_SESSION['account_email']
